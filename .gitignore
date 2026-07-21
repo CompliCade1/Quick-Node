@@ -82,8 +82,4 @@ enc_temp_folder/*
 Windows/*
 Exports/*
 
-!Intermediate/ProjectFiles/
-Intermediate/ProjectFiles/UE*
-Intermediate/ProjectFiles/*.vcxproj.user
-
 Config/DefaultQuickNode.ini
