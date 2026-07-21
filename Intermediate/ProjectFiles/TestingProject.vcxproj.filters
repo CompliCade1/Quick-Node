@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Config">
+      <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultInput.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Source">
+      <UniqueIdentifier>{F31BBDD1-B3E8-3BCC-9652-680E16935819}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\TestingProject.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\TestingProjectEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <Filter Include="Source\TestingProject">
+      <UniqueIdentifier>{D25E8587-D27B-3BBA-BEC0-08B09277C3DD}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\TestingProject\TestingProject.Build.cs">
+      <Filter>Source\TestingProject</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\TestingProject\TestingProject.cpp">
+      <Filter>Source\TestingProject</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\TestingProject\TestingProject.h">
+      <Filter>Source\TestingProject</Filter>
+    </ClInclude>
+    <None Include="..\..\TestingProject.uproject" />
+  </ItemGroup>
+</Project>
