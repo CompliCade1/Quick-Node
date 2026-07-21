@@ -33,7 +33,6 @@
 #include "Windows/HideWindowsPlatformTypes.h"
 
 #include "D3D11.h"
-#include "d3d9.h"
 
 #define _CRT_SECURE_NO_WARNINGS
 #define STB_IMAGE_IMPLEMENTATION
