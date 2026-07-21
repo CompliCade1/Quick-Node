@@ -170,6 +170,7 @@ void FQuickNodeModule::RefreshShortcuts()
 		if (SelfRef->ManualGroups.Num() > 0 && SelfRef->ManualGroups.Find("Basics")) {
 			if (SelfRef->ManualGroups["Basics"][7]) {
 				delete SelfRef->ManualGroups["Basics"][7];
+				SelfRef->ManualGroups["Basics"][7] = nullptr;
 			}
 			FString StandardMacrosFilePath = "/Engine/EditorBlueprintResources/StandardMacros.StandardMacros";
 			SelfRef->ManualGroups["Basics"][7] = new QuickNodeMacroOption(HelperFunctions::GetMacroGraphFromBlueprint(HelperFunctions::FindBlueprintAsset(StandardMacrosFilePath), "IsValid"), "Is Valid");

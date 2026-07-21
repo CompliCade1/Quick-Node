@@ -115,6 +115,7 @@ protected:
 	int ClassGroupIndex = -1;
 	FBlueprintEditor* CurrentBlueprint = nullptr;
 	FString SelectWindowName = "SelectWindow";
+	const char* PreviewWindowName = "Preview";
 
 	int SelectedGroup = 0;
 	const float StartMoveDelay = 0.2f;
@@ -126,7 +127,10 @@ protected:
 	void BeginZHeld();
 	void SetSelectedGroup(int _Group);
 	void UpdateWindowSize();
+
 	void DrawSelectWindow();
 	void CheckShouldCreateNode();
 	void CreateBlueprintNode(QuickNodeOption* _NodeDetails);
+
+	float GetCurrentZoom();
 };

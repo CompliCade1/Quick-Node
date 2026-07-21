@@ -34,13 +34,9 @@
 
 #include "D3D11.h"
 
-#define _CRT_SECURE_NO_WARNINGS
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
 // Simple helper function to load an image into a DX11 texture with common settings
 bool LoadTextureFromMemory(const void* data, size_t data_size, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height)
-{
 	// Load from disk into a raw RGBA buffer
 	int image_width = 0;
 	int image_height = 0;
@@ -84,26 +80,6 @@ bool LoadTextureFromMemory(const void* data, size_t data_size, ID3D11ShaderResou
 
 	return true;
 }
-
-// Open and read a file, then forward to LoadTextureFromMemory()
-bool LoadTextureFromFile(const char* file_name, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height)
-{
-	FILE* f = fopen(file_name, "rb");
-	if (f == NULL)
-		return false;
-	fseek(f, 0, SEEK_END);
-	size_t file_size = (size_t)ftell(f);
-	if (file_size == -1)
-		return false;
-	fseek(f, 0, SEEK_SET);
-	void* file_data = IM_ALLOC(file_size);
-	fread(file_data, 1, file_size, f);
-	fclose(f);
-	bool ret = LoadTextureFromMemory(file_data, file_size, out_srv, out_width, out_height);
-	IM_FREE(file_data);
-	return ret;
-}
-
 const ImVec2 ButtonSize = ImVec2(150.f, 100.f);
 ImVec2 SelectWindowSize = ImVec2(340, 150);
 
@@ -255,12 +231,14 @@ void FQuickNodeInputProcessor::Tick(const float DeltaTime, FSlateApplication& Sl
 	static bool ZWasHeld = false;
 	if (ScopedContext && ShouldDrawMenu)
 	{
+		ImGui::SetWindowSize(PreviewWindowName, ImVec2(128 / GetCurrentZoom(), 64 / GetCurrentZoom()));
 		DrawSelectWindow();
 		// If Z is held
 		if (GetKeyState('z') & 0x8000 || GetKeyState('Z') & 0x8000) {
 			if (!ZWasHeld) {
 				ImGui::SetWindowPos(TCHAR_TO_UTF8(*SelectWindowName), MousePos - FVector2D(SelectWindowSize) / 2.f);
 				ImGui::SetWindowSize(TCHAR_TO_UTF8(*SelectWindowName), SelectWindowSize);
+				ImGui::SetWindowPos(PreviewWindowName, MousePos);
 			}
 			ZWasHeld = true;
 		}
@@ -494,11 +472,19 @@ void FQuickNodeInputProcessor::UpdateWindowSize()
 
 void FQuickNodeInputProcessor::DrawSelectWindow()
 {
+	ImGuiWindowFlags PreviewFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
+	if (ImGui::Begin(PreviewWindowName, nullptr, PreviewFlags)) {
+
+	}
+	ImGui::End();
+
 	ImGuiStyle& Style = ImGui::GetStyle();
 	Style.WindowRounding = 10.f;
 
-	ImGuiWindowFlags Flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
-	if (ImGui::Begin(TCHAR_TO_UTF8(*SelectWindowName), nullptr, Flags)) {
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.f, 0.3f, 0.1f, 0.2f));
+
+	ImGuiWindowFlags SelectFlags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
+	if (ImGui::Begin(TCHAR_TO_UTF8(*SelectWindowName), nullptr, SelectFlags)) {
 		if (OptionGroups.IsValidIndex(SelectedGroup)) {
 			FString Text = OptionGroups[SelectedGroup].GroupName + " " + FString::FromInt(SelectedGroup + 1) + "/" + FString::FromInt(OptionGroups.Num());
 			ImGui::SetCursorPosX(SelectWindowSize.x / 2.f - ImGui::CalcTextSize(TCHAR_TO_UTF8(*Text)).x / 2.f);
@@ -522,6 +508,7 @@ void FQuickNodeInputProcessor::DrawSelectWindow()
 	}
 
 	ImGui::End();
+	ImGui::PopStyleColor();
 }
 
 void FQuickNodeInputProcessor::CheckShouldCreateNode()
@@ -616,6 +603,20 @@ void FQuickNodeInputProcessor::CreateBlueprintNode(QuickNodeOption* _NodeOption)
 
 	// Notify Blueprint system of changes
 	FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(BlueprintRef);
+}
+
+float FQuickNodeInputProcessor::GetCurrentZoom()
+{
+	if (CurrentBlueprint == nullptr) {
+		return 1.f;
+	}
+
+	// Get offset and zoom of the current graph
+	FVector2D Offset;
+	float Zoom;
+	CurrentBlueprint->GetViewLocation(Offset, Zoom);
+
+	return Zoom;
 }
 
 bool QuickNodeOption::SetUpNode(UK2Node* _Node)
