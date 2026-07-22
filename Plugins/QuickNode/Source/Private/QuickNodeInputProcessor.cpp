@@ -188,9 +188,9 @@ void FQuickNodeInputProcessor::Tick(const float DeltaTime, FSlateApplication& Sl
 		// If Z is held
 		if (GetKeyState('z') & 0x8000 || GetKeyState('Z') & 0x8000) {
 			if (!ZWasHeld) {
-				ImGui::SetWindowPos(TCHAR_TO_UTF8(*SelectWindowName), MousePos - FVector2D(SelectWindowSize) / 2.f);
+				ImGui::SetWindowPos(TCHAR_TO_UTF8(*SelectWindowName), InitialPos - FVector2D(SelectWindowSize) / 2.f);
 				ImGui::SetWindowSize(TCHAR_TO_UTF8(*SelectWindowName), SelectWindowSize);
-				ImGui::SetWindowPos(PreviewWindowName, MousePos);
+				ImGui::SetWindowPos(PreviewWindowName, InitialPos);
 			}
 			ZWasHeld = true;
 		}
@@ -198,6 +198,12 @@ void FQuickNodeInputProcessor::Tick(const float DeltaTime, FSlateApplication& Sl
 			CheckShouldCreateNode();
 			ShouldDrawMenu = false;
 			ZWasHeld = false;
+		}
+
+		// If ctrl is held
+		if (GetKeyState(VK_CONTROL) & 0x8000) {
+			SpawnMousePos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
+			ImGui::SetWindowPos(PreviewWindowName, SpawnMousePos);
 		}
 
 		// Check moving left
@@ -363,7 +369,8 @@ void FQuickNodeInputProcessor::BeginZHeld()
 	if (!ToggledOn) {
 		return;
 	}
-	MousePos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
+	InitialPos = { ImGui::GetMousePos().x, ImGui::GetMousePos().y };
+	SpawnMousePos = InitialPos;
 
 	CurrentBlueprint = nullptr;
 	if (ClassGroupIndex != -1) {
@@ -405,7 +412,7 @@ void FQuickNodeInputProcessor::SetSelectedGroup(int _Group)
 	SelectedGroup = _Group;
 	UpdateWindowSize();
 
-	ImGui::SetWindowPos(TCHAR_TO_UTF8(*SelectWindowName), MousePos - FVector2D(SelectWindowSize) / 2.f);
+	ImGui::SetWindowPos(TCHAR_TO_UTF8(*SelectWindowName), InitialPos - FVector2D(SelectWindowSize) / 2.f);
 	ImGui::SetWindowSize(TCHAR_TO_UTF8(*SelectWindowName), SelectWindowSize);
 }
 
@@ -546,7 +553,7 @@ void FQuickNodeInputProcessor::CreateBlueprintNode(QuickNodeOption* _NodeOption)
 	FVector2D RelativePos = (FVector2D)CurrentBlueprint->OpenGraphAndBringToFront(BlueprintGraph)->GetCachedGeometry().GetAbsolutePosition();
 
 	// Set the position of node in the graph
-	FVector2D SpawnPos = (MousePos - RelativePos) / Zoom + Offset;
+	FVector2D SpawnPos = (SpawnMousePos - RelativePos) / Zoom + Offset;
 	PrintNode->NodePosX = SpawnPos.X;
 	PrintNode->NodePosY = SpawnPos.Y;
 

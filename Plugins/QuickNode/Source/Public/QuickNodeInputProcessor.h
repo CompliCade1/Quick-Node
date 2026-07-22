@@ -108,7 +108,8 @@ protected:
 
 	bool ToggledOn = true;
 	bool ShouldDrawMenu = false;
-	FVector2D MousePos;
+	FVector2D InitialPos;
+	FVector2D SpawnMousePos;
 	int CurrentSelected = -1;
 	int UserOptionsIndex = -1;
 	TArray<FRC_OptionGroup> OptionGroups;
