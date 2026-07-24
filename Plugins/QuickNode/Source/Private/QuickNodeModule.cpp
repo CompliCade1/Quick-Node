@@ -44,8 +44,6 @@ void FQuickNodeModule::StartupModule()
 		}
 	}
 
-	GEditor->OnBlueprintCompiled().AddLambda([] { RefreshShortcuts(); });
-
 	FString StandardMacrosFilePath = "/Engine/EditorBlueprintResources/StandardMacros.StandardMacros";
 	// Add manual functions
 	TArray<QuickNodeOption*> BasicGroup;
@@ -119,6 +117,9 @@ void FQuickNodeModule::StartupModule()
 	RegisterShortcuts();
 
 	OnStartup.Broadcast();
+
+	TickDelegate = FTickerDelegate::CreateRaw(this, &FQuickNodeModule::ModuleTick);
+	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(TickDelegate);
 #endif
 }
 
@@ -144,6 +145,8 @@ void FQuickNodeModule::ShutdownModule()
 	CleanShortcuts();
 
 	SelfRef = nullptr;
+
+	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
 #endif
 }
 
@@ -218,6 +221,17 @@ TArray<QuickNodeOption*> FQuickNodeModule::GetManualGroupFromName(FString _Name)
 		return SelfRef->ManualGroups[_Name];
 	}
 	return TArray<QuickNodeOption*>();
+}
+
+bool FQuickNodeModule::ModuleTick(float _DeltaTime)
+{
+	if (!FirstTickPassed) {
+		FirstTickPassed = true;
+
+		GEditor->OnBlueprintCompiled().AddLambda([] { RefreshShortcuts(); });
+	}
+
+	return true;
 }
 
 #undef LOCTEXT_NAMESPACE

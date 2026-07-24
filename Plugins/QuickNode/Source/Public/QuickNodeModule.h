@@ -3,6 +3,7 @@
 #include "Engine.h"
 #include "Modules/ModuleInterface.h"
 #include "UnrealEd.h"
+#include "Containers/Ticker.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(QuickNode, All, All)
 class ISettingsSection;
@@ -27,7 +28,14 @@ public:
 	static bool GetHasStarted();
 	static TArray<QuickNodeOption*> GetManualGroupFromName(FString _Name);
 
+	bool ModuleTick(float _DeltaTime);
+
 private:
+	bool FirstTickPassed = false;
+
+	FTickerDelegate TickDelegate;
+	FTSTicker::FDelegateHandle TickDelegateHandle;
+
 	TSharedPtr<ISettingsSection> ModuleSettings = nullptr;
 	static FQuickNodeModule* SelfRef;
 	TMap<FString, TArray<QuickNodeOption*>> ManualGroups;
